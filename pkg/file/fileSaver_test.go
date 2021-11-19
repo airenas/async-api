@@ -11,7 +11,7 @@ import (
 
 func TestSaves(t *testing.T) {
 	fakeFile := fakeWriterCloser{bytes.NewBufferString(""), "", false}
-	fileSaver := LocalFileSaver{StoragePath: "/data/",
+	fileSaver := LocalSaver{StoragePath: "/data/",
 		OpenFileFunc: func(file string) (WriterCloser, error) {
 			fakeFile.Name = file
 			return &fakeFile, nil
@@ -25,7 +25,7 @@ func TestSaves(t *testing.T) {
 
 func TestFailsOnNoOpen(t *testing.T) {
 	fakeFile := fakeWriterCloser{bytes.NewBufferString(""), "", false}
-	fileSaver := LocalFileSaver{StoragePath: "",
+	fileSaver := LocalSaver{StoragePath: "",
 		OpenFileFunc: func(file string) (WriterCloser, error) {
 			return &fakeFile, errors.New("olia")
 		}}
@@ -35,7 +35,7 @@ func TestFailsOnNoOpen(t *testing.T) {
 
 func TestFails_WrongPath(t *testing.T) {
 	fakeFile := fakeWriterCloser{bytes.NewBufferString(""), "", false}
-	fileSaver := LocalFileSaver{StoragePath: "/data/",
+	fileSaver := LocalSaver{StoragePath: "/data/",
 		OpenFileFunc: func(file string) (WriterCloser, error) {
 			fakeFile.Name = file
 			return &fakeFile, nil
@@ -45,10 +45,10 @@ func TestFails_WrongPath(t *testing.T) {
 }
 
 func TestChecksDirOnInit(t *testing.T) {
-	_, err := NewLocalFileSaver("./")
+	_, err := NewLocalSaver("./")
 	assert.Nil(t, err)
 
-	_, err = NewLocalFileSaver("")
+	_, err = NewLocalSaver("")
 	assert.NotNil(t, err)
 }
 

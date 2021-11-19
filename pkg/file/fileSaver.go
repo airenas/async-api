@@ -20,15 +20,15 @@ type WriterCloser interface {
 //OpenFileFunc declares function to open file by name and return Writer
 type OpenFileFunc func(fileName string) (WriterCloser, error)
 
-// LocalFileSaver saves file on local disk
-type LocalFileSaver struct {
+// LocalSaver saves file on local disk
+type LocalSaver struct {
 	// StoragePath is the main folder to save into
 	StoragePath  string
 	OpenFileFunc OpenFileFunc
 }
 
-//NewLocalFileSaver creates LocalFileSaver instance
-func NewLocalFileSaver(storagePath string) (*LocalFileSaver, error) {
+//NewLocalSaver creates LocalSaver instance
+func NewLocalSaver(storagePath string) (*LocalSaver, error) {
 	goapp.Log.Infof("Init Local File Storage at: %s", storagePath)
 	if storagePath == "" {
 		return nil, errors.New("No storage path provided")
@@ -36,7 +36,7 @@ func NewLocalFileSaver(storagePath string) (*LocalFileSaver, error) {
 	if err := checkCreateDir(storagePath); err != nil {
 		return nil, errors.Wrapf(err, "can't create dir %s", storagePath)
 	}
-	f := LocalFileSaver{StoragePath: storagePath, OpenFileFunc: openFile}
+	f := LocalSaver{StoragePath: storagePath, OpenFileFunc: openFile}
 	return &f, nil
 }
 
@@ -49,7 +49,7 @@ func checkCreateDir(dir string) error {
 }
 
 // Save saves file to disk
-func (fs LocalFileSaver) Save(name string, reader io.Reader) error {
+func (fs LocalSaver) Save(name string, reader io.Reader) error {
 	if strings.Contains(name, "..") {
 		return errors.New("wrong path " + name)
 	}
