@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"strings"
 	"sync"
 	"time"
 
@@ -21,7 +20,7 @@ type IndexData struct {
 }
 
 //NewIndexData creates index data
-func newIndexData(table string, field string, unique bool) IndexData {
+func NewIndexData(table string, field string, unique bool) IndexData {
 	return IndexData{Table: table, Fields: []string{field}, Unique: unique}
 }
 
@@ -118,26 +117,3 @@ func mongoContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), 5*time.Second)
 }
 
-func sanitize(s string) string {
-	return strings.Trim(s, " $/^\\")
-}
-
-func skipNoDocErr(err error) error {
-	if err == mongo.ErrNoDocuments {
-		return nil
-	}
-	return err
-}
-
-func newColl(pr *SessionProvider, tName string) (*mongo.Collection, context.Context, func(), error) {
-	session, err := pr.NewSession()
-	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "can't init new session")
-	}
-	res := session.Client().Database(pr.store).Collection(tName)
-	ctx, cancel := mongoContext()
-	return res, ctx, func() {
-		session.EndSession(context.Background())
-		cancel()
-	}, nil
-}
