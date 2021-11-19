@@ -33,15 +33,19 @@ func NewLocalFileSaver(storagePath string) (*LocalFileSaver, error) {
 	if storagePath == "" {
 		return nil, errors.New("No storage path provided")
 	}
-	if _, err := os.Stat(storagePath); os.IsNotExist(err) {
-		goapp.Log.Infof("Trying to create storage directory at: %s", storagePath)
-		err = os.MkdirAll(storagePath, os.ModePerm)
-		if err != nil {
-			return nil, err
-		}
+	if err := checkCreateDir(storagePath); err != nil {
+		return nil, errors.Wrapf(err, "can't create dir %s", storagePath)
 	}
 	f := LocalFileSaver{StoragePath: storagePath, OpenFileFunc: openFile}
 	return &f, nil
+}
+
+func checkCreateDir(dir string) error {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		goapp.Log.Infof("Trying to create storage directory at: %s", dir)
+		return os.MkdirAll(dir, os.ModePerm)
+	}
+	return nil
 }
 
 // Save saves file to disk
@@ -65,12 +69,8 @@ func (fs LocalFileSaver) Save(name string, reader io.Reader) error {
 
 func openFile(fileName string) (WriterCloser, error) {
 	dir := filepath.Dir(fileName)
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		goapp.Log.Infof("Trying to create storage directory at: %s", dir)
-		err = os.MkdirAll(dir, os.ModePerm)
-		if err != nil {
-			return nil, errors.Wrapf(err, "can't create dir '%s'", dir)
-		}
+	if err := checkCreateDir(dir); err != nil {
+		return nil, errors.Wrapf(err, "can't create dir '%s'", dir)
 	}
 	return os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0666)
 }
