@@ -31,7 +31,7 @@ type LocalSaver struct {
 func NewLocalSaver(storagePath string) (*LocalSaver, error) {
 	goapp.Log.Infof("Init Local File Storage at: %s", storagePath)
 	if storagePath == "" {
-		return nil, errors.New("No storage path provided")
+		return nil, errors.New("no storage path provided")
 	}
 	if err := checkCreateDir(storagePath); err != nil {
 		return nil, errors.Wrapf(err, "can't create dir %s", storagePath)
