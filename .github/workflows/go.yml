@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.7
+    - name: Set up Go 1.17
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
@@ -49,7 +49,7 @@ jobs:
     - name: Update/clean dependencies
       run: |
         go mod tidy
-        
+
     - name: Calc coverage
       run: |
         go test -v -covermode=count -coverprofile=coverage.out ./...
