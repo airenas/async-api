@@ -21,6 +21,7 @@ require (
 )
 
 require (
+	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gogap/env_json v0.0.0-20150503135429-86150085ddbe // indirect
@@ -39,6 +40,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.9.0 // indirect
+	github.com/streadway/amqp v1.0.0
 	github.com/subosito/gotenv v1.2.0 // indirect
 	go.mongodb.org/mongo-driver v1.7.4
 	golang.org/x/sys v0.0.0-20211117180635-dee7805ff2e1 // indirect
