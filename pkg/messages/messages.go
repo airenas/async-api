@@ -16,3 +16,8 @@ type QueueMessage struct {
 	Tags  []Tag  `json:"tags,omitempty"`
 	Error string `json:"error,omitempty"`
 }
+
+//NewQueueMessageFromM copies message
+func NewQueueMessageFromM(m *QueueMessage) *QueueMessage {
+	return &QueueMessage{ID: m.ID, Tags: m.Tags}
+}
