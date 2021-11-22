@@ -19,6 +19,15 @@ type QueueMessage struct {
 	Error string `json:"error,omitempty"`
 }
 
+const (
+	// InformType_Started type when process started
+	InformType_Started string = "Started"
+	// InformType_Finished type when process finished
+	InformType_Finished string = "Finished"
+	// InformType_Failed type when process failed
+	InformType_Failed string = "Failed"
+)
+
 //InformMessage message with inform information
 type InformMessage struct {
 	QueueMessage
