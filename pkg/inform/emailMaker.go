@@ -15,7 +15,7 @@ type SimpleEmailMaker struct {
 	c   *viper.Viper
 }
 
-func newSimpleEmailMaker(c *viper.Viper) (*SimpleEmailMaker, error) {
+func NewSimpleEmailMaker(c *viper.Viper) (*SimpleEmailMaker, error) {
 	r := SimpleEmailMaker{c: c}
 	var err error
 	r.url, err = getStringNonNil(c, "mail.url")
