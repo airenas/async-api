@@ -11,7 +11,7 @@ func TestGetBytes_Simple(t *testing.T) {
 	m := messages.QueueMessage{ID: "id", Error: "err"}
 	b, err := getBytes(m)
 	assert.Nil(t, err)
-	assert.Equal(t, "{\"id\":\"id\",\"recognizer\":\"rec\"}", string(b))
+	assert.Equal(t, "{\"id\":\"id\",\"error\":\"err\"}", string(b))
 }
 
 // func TestGetBytes_ResultMsg(t *testing.T) {
