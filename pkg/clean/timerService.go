@@ -17,17 +17,17 @@ type Cleaner interface {
 	Clean(ID string) error
 }
 
-type timerServiceData struct {
-	runEvery    time.Duration
-	cleaner     Cleaner
-	idsProvider OldIDsProvider
+type TimerData struct {
+	RunEvery    time.Duration
+	Cleaner     Cleaner
+	IDsProvider OldIDsProvider
 }
 
-func StartCleanTimer(ctx context.Context, data *timerServiceData) (<-chan struct{}, error) {
-	if data.runEvery < time.Minute {
-		return nil, errors.Errorf("wrong run every duration %s, expected >= 1m", data.runEvery.String())
+func StartCleanTimer(ctx context.Context, data *TimerData) (<-chan struct{}, error) {
+	if data.RunEvery < time.Minute {
+		return nil, errors.Errorf("wrong run every duration %s, expected >= 1m", data.RunEvery.String())
 	}
-	goapp.Log.Infof("Starting timer service every %v", data.runEvery)
+	goapp.Log.Infof("Starting timer service every %v", data.RunEvery)
 	res := make(chan struct{}, 2)
 	go func() {
 		defer close(res)
@@ -36,8 +36,8 @@ func StartCleanTimer(ctx context.Context, data *timerServiceData) (<-chan struct
 	return res, nil
 }
 
-func serviceLoop(ctx context.Context, data *timerServiceData) {
-	ticker := time.NewTicker(data.runEvery)
+func serviceLoop(ctx context.Context, data *TimerData) {
+	ticker := time.NewTicker(data.RunEvery)
 	// run on startup
 	doClean(data)
 	for {
@@ -52,15 +52,15 @@ func serviceLoop(ctx context.Context, data *timerServiceData) {
 	}
 }
 
-func doClean(data *timerServiceData) {
+func doClean(data *TimerData) {
 	goapp.Log.Info("Running cleaning")
-	ids, err := data.idsProvider.GetExpired()
+	ids, err := data.IDsProvider.GetExpired()
 	if err != nil {
 		goapp.Log.Error(err)
 	}
 	goapp.Log.Infof("Got %d IDs to clean", len(ids))
 	for _, id := range ids {
-		err = data.cleaner.Clean(id)
+		err = data.Cleaner.Clean(id)
 		if err != nil {
 			goapp.Log.Error(err)
 		}
