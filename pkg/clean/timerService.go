@@ -13,6 +13,10 @@ type OldIDsProvider interface {
 	GetExpired() ([]string, error)
 }
 
+type Cleaner interface {
+	Clean(ID string) error
+}
+
 type timerServiceData struct {
 	runEvery    time.Duration
 	cleaner     Cleaner
