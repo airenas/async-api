@@ -63,7 +63,7 @@ func (p *CleanIDsProvider) GetExpired() ([]string, error) {
 		}
 		goapp.Log.Debugf("Loaded %d records", len(recs))
 		for _, r := range recs {
-			if p.isOld(r, expDate) {
+			if isOld(r, expDate) {
 				id, err := getID(r)
 				if err != nil {
 					return nil, err
@@ -82,7 +82,7 @@ func (p *CleanIDsProvider) GetExpired() ([]string, error) {
 	}
 }
 
-func (p *CleanIDsProvider) isOld(m bson.M, expireDate time.Time) bool {
+func isOld(m bson.M, expireDate time.Time) bool {
 	id, ok := m["_id"].(primitive.ObjectID)
 	if !ok {
 		goapp.Log.Warn("_id not found in record")
