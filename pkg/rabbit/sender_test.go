@@ -13,14 +13,6 @@ func TestGetBytes_Simple(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "{\"id\":\"id\",\"error\":\"err\"}", string(b))
 }
-
-// func TestGetBytes_ResultMsg(t *testing.T) {
-// 	m := messages.ResultMessage{QueueMessage: *messages.NewQueueMessage("id", "rec", nil), Result: "res"}
-// 	b, err := getBytes(m)
-// 	assert.Nil(t, err)
-// 	assert.Equal(t, "{\"id\":\"id\",\"recognizer\":\"rec\",\"result\":\"res\"}", string(b))
-// }
-
 func TestGetBytes_Bytes(t *testing.T) {
 	b, err := getBytes([]byte("olia"))
 	assert.Nil(t, err)

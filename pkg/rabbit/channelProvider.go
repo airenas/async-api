@@ -13,10 +13,10 @@ import (
 
 //ChannelProvider provider amqp channel
 type ChannelProvider struct {
-	url     string
-	conn    *amqp.Connection
-	ch      *amqp.Channel
-	m       sync.Mutex // struct field mutex
+	url  string
+	conn *amqp.Connection
+	ch   *amqp.Channel
+	m    sync.Mutex // struct field mutex
 }
 
 type runOnChannelFunc func(*amqp.Channel) error
@@ -29,12 +29,15 @@ func NewChannelProvider(url, user, pass string) (*ChannelProvider, error) {
 	if user != "" && pass == "" {
 		return nil, errors.New("no broker password set")
 	}
-	finalURL := "amqp://"
+	return &ChannelProvider{url: prepareURL(url, user, pass)}, nil
+}
+
+func prepareURL(url, user, pass string) string {
+	res := "amqp://"
 	if user != "" {
-		finalURL = finalURL + user + ":" + pass + "@"
+		res += user + ":" + pass + "@"
 	}
-	finalURL = finalURL + url
-	return &ChannelProvider{url: finalURL}, nil
+	return res + url
 }
 
 //Channel return cached channel or tries to connect to rabbit broker
