@@ -27,13 +27,24 @@ func StartCleanTimer(ctx context.Context, data *TimerData) (<-chan struct{}, err
 	if data.RunEvery < time.Minute {
 		return nil, errors.Errorf("wrong run every duration %s, expected >= 1m", data.RunEvery.String())
 	}
+	if data.Cleaner == nil {
+		return nil, errors.Errorf("no cleaner")
+	}
+	if data.IDsProvider == nil {
+		return nil, errors.Errorf("no IDs provider")
+	}
+
+	return startLoop(ctx, data), nil
+}
+
+func startLoop(ctx context.Context, data *TimerData) <-chan struct{} {
 	goapp.Log.Infof("Starting timer service every %v", data.RunEvery)
 	res := make(chan struct{}, 2)
 	go func() {
 		defer close(res)
 		serviceLoop(ctx, data)
 	}()
-	return res, nil
+	return res
 }
 
 func serviceLoop(ctx context.Context, data *TimerData) {
