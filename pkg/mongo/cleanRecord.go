@@ -16,6 +16,9 @@ func NewCleanRecord(sessionProvider *SessionProvider, table string) (*CleanRecor
 	if table == "" {
 		return nil, errors.New("no table")
 	}
+	if sessionProvider == nil {
+		return nil, errors.New("no session provider")
+	}
 	f := CleanRecord{sessionProvider: sessionProvider, table: table}
 	goapp.Log.Infof("Init Mongo table Clean for %s", table)
 	return &f, nil

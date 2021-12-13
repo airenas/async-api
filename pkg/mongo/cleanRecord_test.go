@@ -17,8 +17,9 @@ func TestNewCleanRecord(t *testing.T) {
 		want    *CleanRecord
 		wantErr bool
 	}{
-		{name: "OK", args: args{table: "table"}, wantErr: false},
-		{name: "Fail", args: args{table: ""}, wantErr: true},
+		{name: "OK", args: args{sessionProvider: &SessionProvider{}, table: "table"}, wantErr: false},
+		{name: "Fail", args: args{sessionProvider: &SessionProvider{}, table: ""}, wantErr: true},
+		{name: "Fail", args: args{sessionProvider: nil, table: "table"}, wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
