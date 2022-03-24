@@ -28,6 +28,7 @@ func TestEmail(t *testing.T) {
 	v.Set("mail.url", "url")
 	v.Set("mail.x.subject", "subject")
 	v.Set("mail.x.text", "text")
+	v.Set("smtp.username", "Olia")
 	m, _ := NewSimpleEmailMaker(v)
 	data := Data{}
 	data.Email = "email"

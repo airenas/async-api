@@ -63,7 +63,7 @@ func (maker *SimpleEmailMaker) make(data *Data, c *viper.Viper) (*email.Email, e
 func getStringNonNil(c *viper.Viper, key string) (string, error) {
 	r := c.GetString(key)
 	if r == "" {
-		return "", errors.New("No setting " + key)
+		return "", errors.New("no setting " + key)
 	}
 	return r, nil
 }
