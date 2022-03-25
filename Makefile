@@ -24,6 +24,12 @@ test/lint:
 	golint -set_exit_status ./...
 .PHONY: test/lint
 #####################################################################################
+## creates new git tag and pushes to github 
+git/create/version:
+	git tag $(version)
+	git push origin $(version)
+.PHONY: git/create/version
+#####################################################################################
 ## cleans prepared data for dockeriimage generation
 clean:
 	go mod tidy
