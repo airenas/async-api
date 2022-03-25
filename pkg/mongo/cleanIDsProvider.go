@@ -31,7 +31,7 @@ func NewCleanIDsProvider(sessionProvider *SessionProvider, expireDuration time.D
 	return &f, nil
 }
 
-// Get return expired IDs
+// GetExpired return expired IDs
 func (p *CleanIDsProvider) GetExpired() ([]string, error) {
 	expDate := time.Now().Add(-p.expireDuration)
 	goapp.Log.Infof("Getting old records, time < %s", expDate.String())

@@ -12,6 +12,7 @@ type CleanRecord struct {
 	table           string
 }
 
+// NewCleanRecord initiates object
 func NewCleanRecord(sessionProvider *SessionProvider, table string) (*CleanRecord, error) {
 	if table == "" {
 		return nil, errors.New("no table")

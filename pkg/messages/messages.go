@@ -20,12 +20,12 @@ type QueueMessage struct {
 }
 
 const (
-	// InformType_Started type when process started
-	InformType_Started string = "Started"
-	// InformType_Finished type when process finished
-	InformType_Finished string = "Finished"
-	// InformType_Failed type when process failed
-	InformType_Failed string = "Failed"
+	// InformTypeStarted type when process started
+	InformTypeStarted string = "Started"
+	// InformTypeFinished type when process finished
+	InformTypeFinished string = "Finished"
+	// InformTypeFailed type when process failed
+	InformTypeFailed string = "Failed"
 )
 
 //InformMessage message with inform information

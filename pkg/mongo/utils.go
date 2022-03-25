@@ -8,10 +8,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// Sanitize mongo input
 func Sanitize(s string) string {
 	return strings.Trim(s, " $/^\\")
 }
 
+// SkipNoDocErr checks error and skips if error is mongo.ErrNoDocuments
 func SkipNoDocErr(err error) error {
 	if err == mongo.ErrNoDocuments {
 		return nil
@@ -19,6 +21,7 @@ func SkipNoDocErr(err error) error {
 	return err
 }
 
+// NewCollection initiates new collection for mongo
 func NewCollection(pr *SessionProvider, tName string) (*mongo.Collection, context.Context, func(), error) {
 	session, err := pr.NewSession()
 	if err != nil {
