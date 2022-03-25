@@ -14,12 +14,12 @@ import (
 )
 
 const (
-	//SMTP_NOAUTH login using no authentication
-	SMTP_NOAUTH = "NO_AUTH"
-	//SMTP_PLAIN login using PLAIN authentication for google
-	SMTP_PLAIN = "PLAIN_AUTH"
-	//SMTP_LOGIN login using no authentication for other
-	SMTP_LOGIN = "LOGIN"
+	//SMTPNoAuth login using no authentication
+	SMTPNoAuth = "NO_AUTH"
+	//SMTPPlain login using PLAIN authentication for google
+	SMTPPlain = "PLAIN_AUTH"
+	//SMTPLogin login using no authentication for other
+	SMTPLogin = "LOGIN"
 )
 
 //SimpleEmailSender uses standard esmtp lib to send emails
@@ -30,6 +30,7 @@ type SimpleEmailSender struct {
 	port     int
 }
 
+// NewSimpleEmailSender initiates email sender
 func NewSimpleEmailSender(c *viper.Viper) (*SimpleEmailSender, error) {
 	r := SimpleEmailSender{}
 	var err error
@@ -45,7 +46,7 @@ func NewSimpleEmailSender(c *viper.Viper) (*SimpleEmailSender, error) {
 	if r.port <= 0 {
 		return nil, errors.New("no smtp port")
 	}
-	if r.authType != SMTP_NOAUTH {
+	if r.authType != SMTPNoAuth {
 		r.sendPool, err = email.NewPool(r.getFullHost(), 1, newAuth(r.authType, c))
 		if err != nil {
 			return nil, err
@@ -57,7 +58,7 @@ func NewSimpleEmailSender(c *viper.Viper) (*SimpleEmailSender, error) {
 }
 
 func newAuth(authType string, c *viper.Viper) smtp.Auth {
-	if authType == SMTP_LOGIN {
+	if authType == SMTPLogin {
 		goapp.Log.Infof("Using custom login auth")
 		return auth.LoginAuth(c.GetString("smtp.username"), c.GetString("smtp.password"))
 	}
@@ -68,7 +69,7 @@ func newAuth(authType string, c *viper.Viper) smtp.Auth {
 
 //Send sends email
 func (s *SimpleEmailSender) Send(email *email.Email) error {
-	if s.authType == SMTP_NOAUTH {
+	if s.authType == SMTPNoAuth {
 		return email.Send(s.getFullHost(), nil)
 	}
 	return s.sendPool.Send(email, 10*time.Second)
@@ -81,9 +82,9 @@ func (s *SimpleEmailSender) getFullHost() string {
 func getType(s string) (string, error) {
 	su := strings.TrimSpace(strings.ToUpper(s))
 	if su == "" {
-		return SMTP_PLAIN, nil
+		return SMTPPlain, nil
 	}
-	values := []string{SMTP_NOAUTH, SMTP_PLAIN, SMTP_LOGIN}
+	values := []string{SMTPNoAuth, SMTPPlain, SMTPLogin}
 	for _, st := range values {
 		if st == su {
 			return su, nil

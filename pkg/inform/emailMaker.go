@@ -9,12 +9,13 @@ import (
 	"github.com/jordan-wright/email"
 )
 
-//SimpleEmailMaker makes email from config
+// SimpleEmailMaker makes email from config
 type SimpleEmailMaker struct {
 	url string
 	c   *viper.Viper
 }
 
+// NewSimpleEmailMaker initiates simple email maker
 func NewSimpleEmailMaker(c *viper.Viper) (*SimpleEmailMaker, error) {
 	r := SimpleEmailMaker{c: c}
 	var err error
@@ -25,7 +26,7 @@ func NewSimpleEmailMaker(c *viper.Viper) (*SimpleEmailMaker, error) {
 	return &r, nil
 }
 
-//Make prepares the email for ID
+// Make prepares the email for ID
 func (maker *SimpleEmailMaker) Make(data *Data) (*email.Email, error) {
 	return maker.make(data, maker.c)
 }

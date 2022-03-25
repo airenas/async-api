@@ -21,6 +21,7 @@ type TemplateEmailMaker struct {
 	templates *template.Template
 }
 
+// NewTemplateEmailMaker initiates new maker object
 func NewTemplateEmailMaker(c *viper.Viper) (*TemplateEmailMaker, error) {
 	tFile, err := getStringNonNil(c, "mail.template")
 	if err != nil {
@@ -46,7 +47,7 @@ func newTemplateEmailMaker(c *viper.Viper, tmplStr string) (*TemplateEmailMaker,
 	return &r, nil
 }
 
-//Make prepares the email for ID
+// Make prepares an email for data object
 func (maker *TemplateEmailMaker) Make(data *Data) (*email.Email, error) {
 	return maker.make(data, maker.c)
 }
@@ -66,12 +67,12 @@ type emailData struct {
 func (maker *TemplateEmailMaker) make(data *Data, c *viper.Viper) (*email.Email, error) {
 	r := email.NewEmail()
 	eData := maker.prepareData(data)
-	if sub, err := maker.executeTempl("mail."+data.MsgType+".subject", eData); err != nil {
+	sub, err := maker.executeTempl("mail."+data.MsgType+".subject", eData)
+	if err != nil {
 		return nil, err
-	} else {
-		r.Subject = string(sub)
 	}
-	var err error
+	r.Subject = string(sub)
+
 	if r.Text, err = maker.executeTempl("mail."+data.MsgType+".text", eData); err != nil {
 		return nil, err
 	}

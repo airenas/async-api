@@ -8,12 +8,12 @@ import (
 )
 
 func TestGetType(t *testing.T) {
-	testGetType(t, "", SMTP_PLAIN, false)
+	testGetType(t, "", SMTPPlain, false)
 	testGetType(t, "olia", "", true)
-	testGetType(t, SMTP_PLAIN, SMTP_PLAIN, false)
-	testGetType(t, SMTP_LOGIN, SMTP_LOGIN, false)
-	testGetType(t, SMTP_NOAUTH, SMTP_NOAUTH, false)
-	testGetType(t, "no_auth", SMTP_NOAUTH, false)
+	testGetType(t, SMTPPlain, SMTPPlain, false)
+	testGetType(t, SMTPLogin, SMTPLogin, false)
+	testGetType(t, SMTPNoAuth, SMTPNoAuth, false)
+	testGetType(t, "no_auth", SMTPNoAuth, false)
 }
 
 func TestFullHost(t *testing.T) {
