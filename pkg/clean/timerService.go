@@ -8,21 +8,24 @@ import (
 	"github.com/pkg/errors"
 )
 
-//OldIDsProvider return old ids for cleaning service
+// OldIDsProvider return old ids for cleaning service
 type OldIDsProvider interface {
 	GetExpired() ([]string, error)
 }
 
+// Cleaner interface for one Clean job
 type Cleaner interface {
 	Clean(ID string) error
 }
 
+// TimerData keeps clean timer info
 type TimerData struct {
 	RunEvery    time.Duration
 	Cleaner     Cleaner
 	IDsProvider OldIDsProvider
 }
 
+// StartCleanTimer starts timer in loop for doing clean tasks
 func StartCleanTimer(ctx context.Context, data *TimerData) (<-chan struct{}, error) {
 	if data.RunEvery < time.Minute {
 		return nil, errors.Errorf("wrong run every duration %s, expected >= 1m", data.RunEvery.String())

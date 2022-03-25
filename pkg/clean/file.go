@@ -10,11 +10,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// LocalFile is a struct for local file cleaner
 type LocalFile struct {
 	storagePath string
 	pattern     string
 }
 
+// NewLocalFile creates file cleaner
 func NewLocalFile(storagePath string, pattern string) (*LocalFile, error) {
 	goapp.Log.Infof("Init Local File Storage Clean at: %s/%s", storagePath, pattern)
 	if pattern == "" {
@@ -34,6 +36,7 @@ func NewLocalFile(storagePath string, pattern string) (*LocalFile, error) {
 	return &f, nil
 }
 
+// Clean removes files matching the pattern
 func (fs *LocalFile) Clean(ID string) error {
 	fp := fs.getPath(ID)
 	goapp.Log.Infof("Removing %s", fp)

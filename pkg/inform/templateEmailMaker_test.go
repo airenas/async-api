@@ -56,13 +56,13 @@ func TestTemplateEmail_Fail(t *testing.T) {
 	_, err := m.Make(testEmailData())
 	require.Nil(t, err)
 
-	m, _ = newTemplateEmailMaker(v, testTemplHtml+testTemplText)
+	m, _ = newTemplateEmailMaker(v, testTemplHTML+testTemplText)
 	_, err = m.Make(testEmailData())
 	require.NotNil(t, err)
 	m, _ = newTemplateEmailMaker(v, testTemplSubject+testTemplText)
 	_, err = m.Make(testEmailData())
 	require.NotNil(t, err)
-	m, _ = newTemplateEmailMaker(v, testTemplHtml+testTemplSubject)
+	m, _ = newTemplateEmailMaker(v, testTemplHTML+testTemplSubject)
 	_, err = m.Make(testEmailData())
 	require.NotNil(t, err)
 }
@@ -70,11 +70,11 @@ func TestTemplateEmail_Fail(t *testing.T) {
 const (
 	testTemplSubject = `{{define "mail.Failed.subject"}}Opps guys{{end}}`
 	testTemplText    = `{{define "mail.Failed.text"}}txt {{.ID}} {{.URL}} {{.Date}}{{end}}`
-	testTemplHtml    = `{{define "mail.Failed.html"}}<html>{{.ID}} {{.URL}} {{.Date}}</html>{{end}}`
+	testTemplHTML    = `{{define "mail.Failed.html"}}<html>{{.ID}} {{.URL}} {{.Date}}</html>{{end}}`
 )
 
 func testTemplate() string {
-	return testTemplSubject + testTemplText + testTemplHtml
+	return testTemplSubject + testTemplText + testTemplHTML
 }
 
 func testEmailData() *Data {
