@@ -16,7 +16,7 @@ type OldDirProvider struct {
 	dir            string
 }
 
-//NewCleanIDsProvider creates CleanIDsProvider instances
+// NewOldDirProvider creates OldDirProvider instances
 func NewOldDirProvider(expireDuration time.Duration, dir string) (*OldDirProvider, error) {
 	if expireDuration < time.Minute {
 		return nil, errors.Errorf("wrong expireDuration %s, expected >= 1m", expireDuration.String())
