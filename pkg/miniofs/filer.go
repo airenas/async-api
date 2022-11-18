@@ -20,41 +20,41 @@ type Filer struct {
 
 // Options is minio client initializatoin options
 type Options struct {
-	url, user, key, bucket string
+	URL, User, Key, Bucket string
 }
 
 //NewFiler creates Minio file saver
 func NewFiler(ctx context.Context, opt Options) (*Filer, error) {
-	goapp.Log.Infof("Init MinIO File Storage at: %s(%s)", opt.url, opt.bucket)
+	goapp.Log.Infof("Init MinIO File Storage at: %s(%s)", opt.URL, opt.Bucket)
 	if err := validate(opt); err != nil {
 		return nil, err
 	}
-	minioClient, err := minio.New(opt.url, &minio.Options{
-		Creds:  credentials.NewStaticV4(opt.user, opt.key, ""),
+	minioClient, err := minio.New(opt.URL, &minio.Options{
+		Creds:  credentials.NewStaticV4(opt.User, opt.Key, ""),
 		Secure: false,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("can't init minio client: %w", err)
 	}
 
-	err = minioClient.MakeBucket(ctx, opt.bucket, minio.MakeBucketOptions{})
+	err = minioClient.MakeBucket(ctx, opt.Bucket, minio.MakeBucketOptions{})
 	if err != nil {
-		exists, errBucketExists := minioClient.BucketExists(ctx, opt.bucket)
+		exists, errBucketExists := minioClient.BucketExists(ctx, opt.Bucket)
 		if !(errBucketExists == nil && exists) {
 			return nil, fmt.Errorf("can't init bucket: %w", err)
 		}
 	}
-	return &Filer{minioClient: minioClient, bucket: opt.bucket}, nil
+	return &Filer{minioClient: minioClient, bucket: opt.Bucket}, nil
 }
 
 func validate(opt Options) error {
-	if opt.url == "" {
-		return fmt.Errorf("no url")
+	if opt.URL == "" {
+		return fmt.Errorf("no URL")
 	}
-	if opt.user == "" {
+	if opt.User == "" {
 		return fmt.Errorf("no user")
 	}
-	if opt.bucket == "" {
+	if opt.Bucket == "" {
 		return fmt.Errorf("no bucket")
 	}
 	return nil
