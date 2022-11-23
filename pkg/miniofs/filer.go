@@ -72,3 +72,13 @@ func (fs *Filer) SaveFile(ctx context.Context, name string, reader io.Reader) er
 	goapp.Log.Info().Msgf("Saved file %s. Size = %s b", name, strconv.FormatInt(info.Size, 10))
 	return nil
 }
+
+// LoadFile loads file from s3/minio
+func (fs *Filer) LoadFile(ctx context.Context, name string) (io.ReadCloser, error) {
+	goapp.Log.Info().Str("file", name).Msg("Load")
+	res, err := fs.minioClient.GetObject(ctx, fs.bucket, name, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("can't save %s: %w", name, err)
+	}
+	return res, nil
+}
