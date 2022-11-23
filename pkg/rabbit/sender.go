@@ -29,7 +29,7 @@ func (sender *Sender) Send(message messages.Message, queue string, replyQueue st
 //SendWithCorr sends the message with correlationID
 func (sender *Sender) SendWithCorr(message messages.Message, queue string, replyQueue string, corrID string) error {
 	realQueue := sender.ChannelProvider.QueueName(queue)
-	goapp.Log.Debugf("Sending message to %s", realQueue)
+	goapp.Log.Debug().Msgf("Sending message to %s", realQueue)
 
 	msgBytes, err := getBytes(message)
 	if err != nil {

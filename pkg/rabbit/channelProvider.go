@@ -70,7 +70,7 @@ func (pr *ChannelProvider) RunOnChannelWithRetry(f runOnChannelFunc) error {
 	}
 	err = f(ch)
 	if err != nil {
-		goapp.Log.Infof("retry opening channel")
+		goapp.Log.Info().Msgf("retry opening channel")
 		pr.Close()
 		ch, err = pr.Channel()
 		if err != nil {
@@ -114,7 +114,7 @@ func dial(url string) (*amqp.Connection, error) {
 	var res *amqp.Connection
 	op := func() error {
 		var err error
-		goapp.Log.Info("Dial " + goapp.HidePass(url))
+		goapp.Log.Info().Msg("Dial " + goapp.HidePass(url))
 		res, err = amqp.Dial(url)
 		return err
 	}
@@ -122,7 +122,7 @@ func dial(url string) (*amqp.Connection, error) {
 	bo.MaxElapsedTime = 2 * time.Minute
 	err := backoff.Retry(op, bo)
 	if err == nil {
-		goapp.Log.Info("Connected to " + goapp.HidePass(url))
+		goapp.Log.Info().Msg("Connected to " + goapp.HidePass(url))
 	}
 	return res, err
 }

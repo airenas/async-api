@@ -18,7 +18,7 @@ type LocalFile struct {
 
 // NewLocalFile creates file cleaner
 func NewLocalFile(storagePath string, pattern string) (*LocalFile, error) {
-	goapp.Log.Infof("Init Local File Storage Clean at: %s/%s", storagePath, pattern)
+	goapp.Log.Info().Msgf("Init Local File Storage Clean at: %s/%s", storagePath, pattern)
 	if pattern == "" {
 		return nil, errors.New("no pattern provided")
 	}
@@ -39,7 +39,7 @@ func NewLocalFile(storagePath string, pattern string) (*LocalFile, error) {
 // Clean removes files matching the pattern
 func (fs *LocalFile) Clean(ID string) error {
 	fp := fs.getPath(ID)
-	goapp.Log.Infof("Removing %s", fp)
+	goapp.Log.Info().Msgf("Removing %s", fp)
 	return remove(fp)
 }
 
@@ -53,7 +53,7 @@ func remove(fn string) error {
 		if err != nil {
 			return err
 		}
-		goapp.Log.Infof("Removed %s", file)
+		goapp.Log.Info().Msgf("Removed %s", file)
 	}
 	return nil
 }

@@ -25,7 +25,7 @@ type Options struct {
 
 //NewFiler creates Minio file saver
 func NewFiler(ctx context.Context, opt Options) (*Filer, error) {
-	goapp.Log.Infof("Init MinIO File Storage at: %s(%s)", opt.URL, opt.Bucket)
+	goapp.Log.Info().Msgf("Init MinIO File Storage at: %s(%s)", opt.URL, opt.Bucket)
 	if err := validate(opt); err != nil {
 		return nil, err
 	}
@@ -69,6 +69,6 @@ func (fs *Filer) SaveFile(ctx context.Context, name string, reader io.Reader) er
 	if err != nil {
 		return fmt.Errorf("can't save %s: %w", name, err)
 	}
-	goapp.Log.Infof("Saved file %s. Size = %s b", name, strconv.FormatInt(info.Size, 10))
+	goapp.Log.Info().Msgf("Saved file %s. Size = %s b", name, strconv.FormatInt(info.Size, 10))
 	return nil
 }

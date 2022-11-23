@@ -34,7 +34,7 @@ func NewCleanIDsProvider(sessionProvider *SessionProvider, expireDuration time.D
 // GetExpired return expired IDs
 func (p *CleanIDsProvider) GetExpired() ([]string, error) {
 	expDate := time.Now().Add(-p.expireDuration)
-	goapp.Log.Infof("Getting old records, time < %s", expDate.String())
+	goapp.Log.Info().Msgf("Getting old records, time < %s", expDate.String())
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -61,7 +61,7 @@ func (p *CleanIDsProvider) GetExpired() ([]string, error) {
 		if err := cursor.All(ctx, &recs); err != nil {
 			return nil, errors.Wrap(err, "can't get data")
 		}
-		goapp.Log.Debugf("Loaded %d records", len(recs))
+		goapp.Log.Debug().Msgf("Loaded %d records", len(recs))
 		for _, r := range recs {
 			if isOld(r, expDate) {
 				id, err := getID(r)
@@ -85,10 +85,10 @@ func (p *CleanIDsProvider) GetExpired() ([]string, error) {
 func isOld(m bson.M, expireDate time.Time) bool {
 	id, ok := m["_id"].(primitive.ObjectID)
 	if !ok {
-		goapp.Log.Warn("_id not found in record")
+		goapp.Log.Warn().Msg("_id not found in record")
 		return false
 	}
-	goapp.Log.Debugf("_id time %s", id.Timestamp().String())
+	goapp.Log.Debug().Msgf("_id time %s", id.Timestamp().String())
 	return id.Timestamp().Before(expireDate)
 }
 

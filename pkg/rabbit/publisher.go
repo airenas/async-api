@@ -19,7 +19,7 @@ func NewPublisher(provider *ChannelProvider) *Publisher {
 //Publish publish the message
 func (sender *Publisher) Publish(id string, topic string) error {
 	realTopic := sender.ChannelProvider.QueueName(topic)
-	goapp.Log.Infof("Publishing event %s(%s)", realTopic, id)
+	goapp.Log.Info().Msgf("Publishing event %s(%s)", realTopic, id)
 
 	err := sender.ChannelProvider.RunOnChannelWithRetry(func(ch *amqp.Channel) error {
 		return ch.Publish(

@@ -56,7 +56,7 @@ func (sp *SessionProvider) NewSession() (mongo.Session, error) {
 	defer sp.m.Unlock()
 
 	if sp.client == nil {
-		goapp.Log.Info("Dial mongo: " + goapp.HidePass(sp.URL))
+		goapp.Log.Info().Msg("Dial mongo: " + goapp.HidePass(sp.URL))
 		ctx, cancel := mongoContext()
 		defer cancel()
 		client, err := mongo.Connect(ctx, options.Client().ApplyURI(sp.URL))

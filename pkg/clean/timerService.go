@@ -41,7 +41,7 @@ func StartCleanTimer(ctx context.Context, data *TimerData) (<-chan struct{}, err
 }
 
 func startLoop(ctx context.Context, data *TimerData) <-chan struct{} {
-	goapp.Log.Infof("Starting timer service every %v", data.RunEvery)
+	goapp.Log.Info().Msgf("Starting timer service every %v", data.RunEvery)
 	res := make(chan struct{}, 2)
 	go func() {
 		defer close(res)
@@ -60,23 +60,23 @@ func serviceLoop(ctx context.Context, data *TimerData) {
 			doClean(data)
 		case <-ctx.Done():
 			ticker.Stop()
-			goapp.Log.Infof("Stopped timer service")
+			goapp.Log.Info().Msgf("Stopped timer service")
 			return
 		}
 	}
 }
 
 func doClean(data *TimerData) {
-	goapp.Log.Info("Running cleaning")
+	goapp.Log.Info().Msg("Running cleaning")
 	ids, err := data.IDsProvider.GetExpired()
 	if err != nil {
-		goapp.Log.Error(err)
+		goapp.Log.Error().Err(err).Send()
 	}
-	goapp.Log.Infof("Got %d IDs to clean", len(ids))
+	goapp.Log.Info().Msgf("Got %d IDs to clean", len(ids))
 	for _, id := range ids {
 		err = data.Cleaner.Clean(id)
 		if err != nil {
-			goapp.Log.Error(err)
+			goapp.Log.Error().Err(err).Send()
 		}
 	}
 }

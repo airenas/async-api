@@ -24,7 +24,7 @@ func NewLocker(sessionProvider *SessionProvider, table string) (*Locker, error) 
 
 //Lock locks record for sending email
 func (ss *Locker) Lock(id string, lockKey string) error {
-	goapp.Log.Infof("Locking %s: %s", id, lockKey)
+	goapp.Log.Info().Msgf("Locking %s: %s", id, lockKey)
 
 	c, ctx, cancel, err := NewCollection(ss.SessionProvider, ss.table)
 	if err != nil {
@@ -48,7 +48,7 @@ func (ss *Locker) Lock(id string, lockKey string) error {
 
 //UnLock marks record with specific value
 func (ss *Locker) UnLock(id string, lockKey string, value *int) error {
-	goapp.Log.Infof("Unlocking table %s: %s", id, lockKey)
+	goapp.Log.Info().Msgf("Unlocking table %s: %s", id, lockKey)
 
 	c, ctx, cancel, err := NewCollection(ss.SessionProvider, ss.table)
 	if err != nil {

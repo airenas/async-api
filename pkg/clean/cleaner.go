@@ -18,7 +18,7 @@ func (c *CleanerGroup) Clean(ID string) error {
 	for _, job := range c.Jobs {
 		err := job.Clean(ID)
 		if err != nil {
-			goapp.Log.Error(err)
+			goapp.Log.Error().Err(err).Send()
 			failed++
 		}
 	}

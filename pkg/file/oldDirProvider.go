@@ -30,7 +30,7 @@ func NewOldDirProvider(expireDuration time.Duration, dir string) (*OldDirProvide
 
 // GetExpired return expired file nams
 func (p *OldDirProvider) GetExpired() ([]string, error) {
-	goapp.Log.Infof("Check dir for old files at: %s", p.dir)
+	goapp.Log.Info().Msgf("Check dir for old files at: %s", p.dir)
 	files, err := ioutil.ReadDir(p.dir)
 	if err != nil {
 		return nil, fmt.Errorf("can't read dir %s: %w", p.dir, err)
@@ -39,7 +39,7 @@ func (p *OldDirProvider) GetExpired() ([]string, error) {
 }
 
 func filterExpired(before time.Time, files []fs.FileInfo) []string {
-	goapp.Log.Infof("Getting old files (from %d), time < %s", len(files), before.String())
+	goapp.Log.Info().Msgf("Getting old files (from %d), time < %s", len(files), before.String())
 
 	var res []string
 	for _, f := range files {

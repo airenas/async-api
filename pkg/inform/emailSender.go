@@ -52,17 +52,17 @@ func NewSimpleEmailSender(c *viper.Viper) (*SimpleEmailSender, error) {
 			return nil, err
 		}
 	}
-	goapp.Log.Infof("SMTP auth type: %s", r.authType)
-	goapp.Log.Infof("SMTP server: %s", r.getFullHost())
+	goapp.Log.Info().Msgf("SMTP auth type: %s", r.authType)
+	goapp.Log.Info().Msgf("SMTP server: %s", r.getFullHost())
 	return &r, nil
 }
 
 func newAuth(authType string, c *viper.Viper) smtp.Auth {
 	if authType == SMTPLogin {
-		goapp.Log.Infof("Using custom login auth")
+		goapp.Log.Info().Msgf("Using custom login auth")
 		return auth.LoginAuth(c.GetString("smtp.username"), c.GetString("smtp.password"))
 	}
-	goapp.Log.Infof("Using plain login auth ")
+	goapp.Log.Info().Msgf("Using plain login auth ")
 	return smtp.PlainAuth("", c.GetString("smtp.username"), c.GetString("smtp.password"),
 		c.GetString("smtp.host"))
 }

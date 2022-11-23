@@ -21,7 +21,7 @@ type LocalLoader struct {
 
 //NewLocalLoader creates LocalLoader instance
 func NewLocalLoader(path string) (*LocalLoader, error) {
-	goapp.Log.Infof("Init Local File Loader at: %s", path)
+	goapp.Log.Info().Msgf("Init Local File Loader at: %s", path)
 	if path == "" {
 		return nil, errors.New("no path provided")
 	}

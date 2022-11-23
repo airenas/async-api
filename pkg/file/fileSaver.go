@@ -29,7 +29,7 @@ type LocalSaver struct {
 
 //NewLocalSaver creates LocalSaver instance
 func NewLocalSaver(storagePath string) (*LocalSaver, error) {
-	goapp.Log.Infof("Init Local File Storage at: %s", storagePath)
+	goapp.Log.Info().Msgf("Init Local File Storage at: %s", storagePath)
 	if storagePath == "" {
 		return nil, errors.New("no storage path provided")
 	}
@@ -42,7 +42,7 @@ func NewLocalSaver(storagePath string) (*LocalSaver, error) {
 
 func checkCreateDir(dir string) error {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		goapp.Log.Infof("Trying to create storage directory at: %s", dir)
+		goapp.Log.Info().Msgf("Trying to create storage directory at: %s", dir)
 		return os.MkdirAll(dir, os.ModePerm)
 	}
 	return nil
@@ -63,7 +63,7 @@ func (fs LocalSaver) Save(name string, reader io.Reader) error {
 	if err != nil {
 		return errors.Wrapf(err, "can not save file %s", fileName)
 	}
-	goapp.Log.Infof("Saved file %s. Size = %s b", fileName, strconv.FormatInt(savedBytes, 10))
+	goapp.Log.Info().Msgf("Saved file %s. Size = %s b", fileName, strconv.FormatInt(savedBytes, 10))
 	return nil
 }
 
