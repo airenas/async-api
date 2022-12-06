@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/airenas/go-app/pkg/goapp"
 	"github.com/minio/minio-go/v7"
@@ -23,7 +25,7 @@ type Options struct {
 	URL, User, Key, Bucket string
 }
 
-//NewFiler creates Minio file saver
+// NewFiler creates Minio file saver
 func NewFiler(ctx context.Context, opt Options) (*Filer, error) {
 	goapp.Log.Info().Msgf("Init MinIO File Storage at: %s(%s)", opt.URL, opt.Bucket)
 	if err := validate(opt); err != nil {
@@ -74,11 +76,73 @@ func (fs *Filer) SaveFile(ctx context.Context, name string, reader io.Reader) er
 }
 
 // LoadFile loads file from s3/minio
-func (fs *Filer) LoadFile(ctx context.Context, name string) (io.ReadCloser, error) {
-	goapp.Log.Info().Str("file", name).Msg("Load")
+func (fs *Filer) LoadFile(ctx context.Context, name string) (io.ReadSeekCloser, error) {
+	goapp.Log.Info().Str("file", name).Msg("load")
 	res, err := fs.minioClient.GetObject(ctx, fs.bucket, name, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("can't save %s: %w", name, err)
 	}
-	return res, nil
+	return &fileWrap{f: res}, nil
+}
+
+type fileWrap struct {
+	f *minio.Object
+}
+
+// Read implements io.ReadSeekCloser
+func (fw *fileWrap) Read(p []byte) (n int, err error) {
+	return fw.f.Read(p)
+}
+
+// Seek implements io.ReadSeekCloser
+func (fw *fileWrap) Seek(offset int64, whence int) (int64, error) {
+	return fw.f.Seek(offset, whence)
+}
+
+// Close implements io.ReadSeekCloser
+func (fw *fileWrap) Close() error {
+	return fw.f.Close()
+}
+
+// Stat returns file stat
+func (fw *fileWrap) Stat() (fs.FileInfo, error) {
+	st, err := fw.f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	return &statsWrap{oi: st}, nil
+}
+
+type statsWrap struct {
+	oi minio.ObjectInfo
+}
+
+// IsDir implements fs.FileInfo
+func (sw *statsWrap) IsDir() bool {
+	return false
+}
+
+// ModTime implements fs.FileInfo
+func (sw *statsWrap) ModTime() time.Time {
+	return sw.oi.LastModified
+}
+
+// Mode implements fs.FileInfo
+func (sw *statsWrap) Mode() fs.FileMode {
+	return fs.ModeTemporary
+}
+
+// Name implements fs.FileInfo
+func (sw *statsWrap) Name() string {
+	return sw.oi.Key
+}
+
+// Size implements fs.FileInfo
+func (sw *statsWrap) Size() int64 {
+	return sw.oi.Size
+}
+
+// Sys implements fs.FileInfo
+func (sw *statsWrap) Sys() any {
+	return nil
 }
