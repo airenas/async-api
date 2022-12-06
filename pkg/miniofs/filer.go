@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"strconv"
 	"strings"
 	"time"
 
@@ -71,7 +70,7 @@ func (fs *Filer) SaveFile(ctx context.Context, name string, reader io.Reader) er
 	if err != nil {
 		return fmt.Errorf("can't save %s: %w", name, err)
 	}
-	goapp.Log.Info().Msgf("Saved file %s. Size = %s b", name, strconv.FormatInt(info.Size, 10))
+	goapp.Log.Info().Str("file", name).Int64("size b", info.Size).Msgf("saved")
 	return nil
 }
 
