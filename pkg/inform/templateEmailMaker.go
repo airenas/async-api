@@ -17,7 +17,7 @@ const dateFormat = "2006-01-02 15:04:05"
 // TemplateEmailMaker makes email from provided template file
 type TemplateEmailMaker struct {
 	url       string
-	c         *viper.Viper
+	from      string
 	templates *template.Template
 }
 
@@ -35,7 +35,7 @@ func NewTemplateEmailMaker(c *viper.Viper) (*TemplateEmailMaker, error) {
 }
 
 func newTemplateEmailMaker(c *viper.Viper, tmplStr string) (*TemplateEmailMaker, error) {
-	r := TemplateEmailMaker{c: c}
+	r := TemplateEmailMaker{}
 	var err error
 	if r.url, err = getStringNonNil(c, "mail.url"); err != nil {
 		return nil, err
@@ -44,12 +44,16 @@ func newTemplateEmailMaker(c *viper.Viper, tmplStr string) (*TemplateEmailMaker,
 	if err != nil {
 		return nil, errors.Wrapf(err, "can't parse template")
 	}
+	r.from, err = getStringNonNil(c, "smtp.username")
+	if err != nil {
+		return nil, err
+	}
 	return &r, nil
 }
 
 // Make prepares an email for data object
 func (maker *TemplateEmailMaker) Make(data *Data) (*email.Email, error) {
-	return maker.make(data, maker.c)
+	return maker.make(data)
 }
 
 func (maker *TemplateEmailMaker) prepareData(data *Data) *emailData {
@@ -64,7 +68,7 @@ type emailData struct {
 	ID, URL, Date string
 }
 
-func (maker *TemplateEmailMaker) make(data *Data, c *viper.Viper) (*email.Email, error) {
+func (maker *TemplateEmailMaker) make(data *Data) (*email.Email, error) {
 	r := email.NewEmail()
 	eData := maker.prepareData(data)
 	sub, err := maker.executeTempl("mail."+data.MsgType+".subject", eData)
@@ -80,14 +84,14 @@ func (maker *TemplateEmailMaker) make(data *Data, c *viper.Viper) (*email.Email,
 		return nil, err
 	}
 	r.To = []string{data.Email}
-	r.From, err = getStringNonNil(c, "smtp.username")
+	r.From = maker.from
 	return r, err
 }
 
 func (maker *TemplateEmailMaker) executeTempl(name string, ed *emailData) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	if err := maker.templates.ExecuteTemplate(buf, name, ed); err != nil {
-		return nil, errors.Wrapf(err, "temlate %s", name)
+		return nil, errors.Wrapf(err, "template %s", name)
 	}
 	return buf.Bytes(), nil
 }
