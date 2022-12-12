@@ -98,7 +98,7 @@ func (fs *Filer) Clean(ctx context.Context, prefix string) error {
 		Recursive: true,
 	})
 
-	rmChan := fs.minioClient.RemoveObjects(ctx, fs.bucket, objectCh, minio.RemoveObjectsOptions{GovernanceBypass: true})
+	rmChan := fs.minioClient.RemoveObjectsWithResult(ctx, fs.bucket, objectCh, minio.RemoveObjectsOptions{GovernanceBypass: true})
 
 	for res := range rmChan {
 		if res.Err != nil {
