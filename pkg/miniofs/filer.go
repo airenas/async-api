@@ -84,6 +84,31 @@ func (fs *Filer) LoadFile(ctx context.Context, name string) (io.ReadSeekCloser, 
 	return &fileWrap{f: res}, nil
 }
 
+// Clean removes all files from s3/minio starting by prefix
+func (fs *Filer) Clean(ctx context.Context, prefix string) error {
+	if prefix == "" {
+		return fmt.Errorf("no prefix")
+	}
+	if !strings.HasSuffix(prefix, "/") {
+		prefix = prefix + "/"
+	}
+	goapp.Log.Info().Str("prefix", prefix).Msg("clean fs")
+	objectCh := fs.minioClient.ListObjects(ctx, fs.bucket, minio.ListObjectsOptions{
+		Prefix:    prefix,
+		Recursive: true,
+	})
+
+	rmChan := fs.minioClient.RemoveObjects(ctx, fs.bucket, objectCh, minio.RemoveObjectsOptions{GovernanceBypass: true})
+
+	for res := range rmChan {
+		if res.Err != nil {
+			return fmt.Errorf("can't remove %s: %w", res.ObjectName, res.Err)
+		}
+		goapp.Log.Info().Str("file", res.ObjectName).Msg("removed")
+	}
+	return nil
+}
+
 type fileWrap struct {
 	f *minio.Object
 }
