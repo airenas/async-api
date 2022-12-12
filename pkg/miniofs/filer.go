@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/airenas/go-app/pkg/goapp"
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -88,6 +89,10 @@ func (fs *Filer) LoadFile(ctx context.Context, name string) (io.ReadSeekCloser, 
 func (fs *Filer) Clean(ctx context.Context, prefix string) error {
 	if prefix == "" {
 		return fmt.Errorf("no prefix")
+	}
+	_, err := uuid.Parse(prefix)
+	if err != nil {
+		return fmt.Errorf("wrong ID")
 	}
 	if !strings.HasSuffix(prefix, "/") {
 		prefix = prefix + "/"
