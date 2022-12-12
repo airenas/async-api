@@ -18,6 +18,7 @@ const dateFormat = "2006-01-02 15:04:05"
 type TemplateEmailMaker struct {
 	url       string
 	from      string
+	sender    string
 	templates *template.Template
 }
 
@@ -48,6 +49,7 @@ func newTemplateEmailMaker(c *viper.Viper, tmplStr string) (*TemplateEmailMaker,
 	if err != nil {
 		return nil, err
 	}
+	r.sender = c.GetString("smtp.sender")
 	return &r, nil
 }
 
@@ -85,6 +87,7 @@ func (maker *TemplateEmailMaker) make(data *Data) (*email.Email, error) {
 	}
 	r.To = []string{data.Email}
 	r.From = maker.from
+	r.Sender = maker.sender
 	return r, err
 }
 
