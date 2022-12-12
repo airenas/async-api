@@ -1,6 +1,7 @@
 package clean
 
 import (
+	"context"
 	"strings"
 
 	"github.com/airenas/go-app/pkg/goapp"
@@ -13,10 +14,10 @@ type CleanerGroup struct {
 }
 
 // Clean runs all cleaners in the group
-func (c *CleanerGroup) Clean(ID string) error {
+func (c *CleanerGroup) Clean(ctx context.Context, ID string) error {
 	failed := 0
 	for _, job := range c.Jobs {
-		err := job.Clean(ID)
+		err := job.Clean(ctx, ID)
 		if err != nil {
 			goapp.Log.Error().Err(err).Send()
 			failed++

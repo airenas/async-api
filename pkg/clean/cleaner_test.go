@@ -1,12 +1,13 @@
 package clean
 
 import (
+	"context"
 	"errors"
 	"testing"
 
-	"github.com/airenas/async-api/internal/pkg/test/mocks"
-	"github.com/petergtz/pegomock"
+	"github.com/airenas/async-api/internal/pkg/test"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestNewFileCleaners(t *testing.T) {
@@ -60,19 +61,26 @@ func TestCleanerGroup_Clean(t *testing.T) {
 			c := &CleanerGroup{
 				Jobs: tt.fields.Jobs,
 			}
-			if err := c.Clean(tt.args.ID); (err != nil) != tt.wantErr {
+			if err := c.Clean(test.Ctx(t), tt.args.ID); (err != nil) != tt.wantErr {
 				t.Errorf("CleanerGroup.Clean() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func newCleanMock(fail bool) *mocks.MockCleaner {
-	res := mocks.NewMockCleaner()
+type mockCleaner struct{ mock.Mock }
+
+func (m *mockCleaner) Clean(ctx context.Context, id string) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func newCleanMock(fail bool) *mockCleaner {
+	res := &mockCleaner{}
 	var err error
 	if fail {
 		err = errors.New("olia")
 	}
-	pegomock.When(res.Clean(pegomock.AnyString())).ThenReturn(err)
+	res.On("Clean", mock.Anything, mock.Anything).Return(err)
 	return res
 }

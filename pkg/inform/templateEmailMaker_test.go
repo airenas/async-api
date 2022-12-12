@@ -25,6 +25,7 @@ func TestTemplateInit_FailsTemplate(t *testing.T) {
 func TestTemplateInit_OK(t *testing.T) {
 	v := viper.New()
 	v.Set("mail.url", "url")
+	v.Set("smtp.username", "email")
 	m, err := newTemplateEmailMaker(v, testTemplate())
 	assert.Nil(t, err)
 	assert.Equal(t, "url", m.url)

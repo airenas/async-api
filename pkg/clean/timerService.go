@@ -10,12 +10,12 @@ import (
 
 // OldIDsProvider return old ids for cleaning service
 type OldIDsProvider interface {
-	GetExpired() ([]string, error)
+	GetExpired(ctx context.Context) ([]string, error)
 }
 
 // Cleaner interface for one Clean job
 type Cleaner interface {
-	Clean(ID string) error
+	Clean(ctx context.Context, ID string) error
 }
 
 // TimerData keeps clean timer info
@@ -53,11 +53,13 @@ func startLoop(ctx context.Context, data *TimerData) <-chan struct{} {
 func serviceLoop(ctx context.Context, data *TimerData) {
 	ticker := time.NewTicker(data.RunEvery)
 	// run on startup
-	doClean(data)
+	doClean(ctx, data)
 	for {
 		select {
 		case <-ticker.C:
-			doClean(data)
+			ctxInt, cf := context.WithTimeout(ctx, time.Second*60)
+			doClean(ctxInt, data)
+			cf()
 		case <-ctx.Done():
 			ticker.Stop()
 			goapp.Log.Info().Msgf("Stopped timer service")
@@ -66,15 +68,15 @@ func serviceLoop(ctx context.Context, data *TimerData) {
 	}
 }
 
-func doClean(data *TimerData) {
+func doClean(ctx context.Context, data *TimerData) {
 	goapp.Log.Info().Msg("Running cleaning")
-	ids, err := data.IDsProvider.GetExpired()
+	ids, err := data.IDsProvider.GetExpired(ctx)
 	if err != nil {
 		goapp.Log.Error().Err(err).Send()
 	}
-	goapp.Log.Info().Msgf("Got %d IDs to clean", len(ids))
+	goapp.Log.Info().Int("count", len(ids)).Msg("Got IDs to clean")
 	for _, id := range ids {
-		err = data.Cleaner.Clean(id)
+		err = data.Cleaner.Clean(ctx, id)
 		if err != nil {
 			goapp.Log.Error().Err(err).Send()
 		}

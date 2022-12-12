@@ -1,4 +1,4 @@
-num=1.0
+num=1.1
 commit_count=$(shell git rev-list --count HEAD)
 
 version?=v$(num).$(commit_count)
