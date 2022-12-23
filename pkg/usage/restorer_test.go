@@ -1,12 +1,12 @@
 package usage
 
 import (
-	"context"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/airenas/async-api/internal/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +28,7 @@ func TestWorker_Do(t *testing.T) {
 	defer srv.Close()
 	got, err := NewRestorer(srv.URL)
 	assert.Nil(t, err)
-	err = got.Do(context.Background(), "id1", "tt:m:rid", "err")
+	err = got.Do(test.Ctx(t), "id1", "tt:m:rid", "err")
 	assert.Nil(t, err)
 }
 
@@ -39,7 +39,7 @@ func TestWorker_Skip_NoRequest(t *testing.T) {
 	defer srv.Close()
 	got, err := NewRestorer(srv.URL)
 	assert.Nil(t, err)
-	err = got.Do(context.Background(), "id1", "", "err")
+	err = got.Do(test.Ctx(t), "id1", "", "err")
 	assert.Nil(t, err)
 }
 
@@ -50,7 +50,7 @@ func TestWorker_Fail(t *testing.T) {
 	defer srv.Close()
 	got, err := NewRestorer(srv.URL)
 	assert.Nil(t, err)
-	err = got.Do(context.Background(), "id1", "tt:m:rid", "err")
+	err = got.Do(test.Ctx(t), "id1", "tt:m:rid", "err")
 	assert.Error(t, err)
 }
 

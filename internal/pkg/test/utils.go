@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+
+// Ctx creates test context
 func Ctx(t *testing.T) context.Context {
 	t.Helper()
 	ctx, cf := context.WithTimeout(context.Background(), time.Second*20)

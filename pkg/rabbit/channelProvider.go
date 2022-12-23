@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/airenas/go-app/pkg/goapp"
-	"github.com/cenkalti/backoff"
+	"github.com/cenkalti/backoff/v4"
 	"github.com/streadway/amqp"
 
 	"github.com/pkg/errors"

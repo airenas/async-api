@@ -11,21 +11,22 @@ import (
 	"time"
 
 	"github.com/airenas/go-app/pkg/goapp"
+	"github.com/cenkalti/backoff/v4"
 	"github.com/pkg/errors"
 )
 
-// Restorter implements usage restore functionality
-type Restorter struct {
+// Restorer implements usage restore functionality
+type Restorer struct {
 	serviceURL string
 	httpClient http.Client
 }
 
 // NewRestorer creates new restorer implementation
-func NewRestorer(url string) (*Restorter, error) {
+func NewRestorer(url string) (*Restorer, error) {
 	if url == "" {
 		return nil, errors.Errorf("no service URL")
 	}
-	res := &Restorter{serviceURL: url}
+	res := &Restorer{serviceURL: url}
 	res.httpClient = http.Client{Transport: &http.Transport{
 		MaxIdleConns:        2,
 		MaxIdleConnsPerHost: 2,
@@ -38,7 +39,7 @@ func NewRestorer(url string) (*Restorter, error) {
 }
 
 // Do tries to restore usage
-func (w *Restorter) Do(ctx context.Context, msgID, reqID, errStr string) error {
+func (w *Restorer) Do(ctx context.Context, msgID, reqID, errStr string) error {
 	goapp.Log.Info().Str("ID", msgID).Str("requestID", reqID).Msg("doing usage restoratioon")
 	if reqID == "" {
 		goapp.Log.Warn().Msg("no requestID")
@@ -63,34 +64,44 @@ type request struct {
 	Error string `json:"error,omitempty"`
 }
 
-func (w *Restorter) invoke(ctx context.Context, service, requestID, errorMsg string) error {
+func (w *Restorer) invoke(ctx context.Context, service, requestID, errorMsg string) error {
 	inp := request{Error: errorMsg}
 	b, err := json.Marshal(inp)
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest(http.MethodPost,
-		fmt.Sprintf("%s/%s/restore/%s", w.serviceURL, service, requestID), bytes.NewReader(b))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	ctx, cancelF := context.WithTimeout(ctx, time.Second*10)
-	defer cancelF()
-	req = req.WithContext(ctx)
 
-	goapp.Log.Info().Str("URL", req.URL.String()).Msg("call")
-	resp, err := w.httpClient.Do(req)
+	_, err = goapp.InvokeWithBackoff(ctx, func() (any, bool, error) {
+		req, err := http.NewRequest(http.MethodPost,
+			fmt.Sprintf("%s/%s/restore/%s", w.serviceURL, service, requestID), bytes.NewReader(b))
+		if err != nil {
+			return nil, false, err
+		}
+		req.Header.Set("Content-Type", "application/json")
+		
+		ctx, cancelF := context.WithTimeout(ctx, time.Second*10)
+		defer cancelF()
+		req = req.WithContext(ctx)
 
-	if err != nil {
-		return fmt.Errorf("can't call '%s': %w", req.URL.String(), err)
-	}
-	defer func() {
-		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 10000))
-		_ = resp.Body.Close()
-	}()
-	if err := goapp.ValidateHTTPResp(resp, 100); err != nil {
-		return fmt.Errorf("can't invoke '%s': %w", req.URL.String(), err)
-	}
-	return nil
+		goapp.Log.Info().Str("URL", req.URL.String()).Msg("call")
+		resp, err := w.httpClient.Do(req)
+		if err != nil {
+			return nil, goapp.IsRetryableErr(err), fmt.Errorf("can't invoke: %w", err)
+		}
+		defer func() {
+			_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 10000))
+			_ = resp.Body.Close()
+		}()
+		if err := goapp.ValidateHTTPResp(resp, 100); err != nil {
+			err = fmt.Errorf("can't invoke '%s': %w", req.URL.String(), err)
+			return nil, goapp.IsRetryableCode(resp.StatusCode), err
+		}
+		return nil, false, nil
+	}, newSimpleBackoff())
+	return err
+}
+
+func newSimpleBackoff() backoff.BackOff {
+	res := backoff.NewExponentialBackOff()
+	return backoff.WithMaxRetries(res, 3)
 }

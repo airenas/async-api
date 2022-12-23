@@ -3,7 +3,8 @@ module github.com/airenas/async-api
 go 1.18
 
 require (
-	github.com/airenas/go-app v1.0.24
+	github.com/airenas/go-app v1.0.25
+	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/google/uuid v1.3.0
 	github.com/minio/minio-go/v7 v7.0.43
 	github.com/pkg/errors v0.9.1
@@ -38,7 +39,6 @@ require (
 )
 
 require (
-	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
