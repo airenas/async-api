@@ -3,7 +3,8 @@ module github.com/airenas/async-api
 go 1.18
 
 require (
-	github.com/airenas/go-app v1.0.22
+	github.com/airenas/go-app v1.0.24
+	github.com/google/uuid v1.3.0
 	github.com/minio/minio-go/v7 v7.0.43
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
@@ -13,7 +14,6 @@ require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.0 // indirect
