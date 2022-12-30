@@ -40,7 +40,7 @@ func NewRestorer(url string) (*Restorer, error) {
 
 // Do tries to restore usage
 func (w *Restorer) Do(ctx context.Context, msgID, reqID, errStr string) error {
-	goapp.Log.Info().Str("ID", msgID).Str("requestID", reqID).Msg("doing usage restoratioon")
+	goapp.Log.Info().Str("ID", msgID).Str("requestID", reqID).Msg("doing usage restoration")
 	if reqID == "" {
 		goapp.Log.Warn().Msg("no requestID")
 		return nil
