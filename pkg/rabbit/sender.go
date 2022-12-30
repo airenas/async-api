@@ -57,10 +57,6 @@ func (sender *Sender) SendWithCorr(message messages.Message, queue string, reply
 }
 
 func getBytes(msg messages.Message) ([]byte, error) {
-	res, isBytes := msg.([]byte)
-	if isBytes {
-		return res, nil
-	}
 	res, err := json.Marshal(msg)
 	if err != nil {
 		return nil, errors.Wrap(err, "can't marshal message")

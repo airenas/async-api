@@ -2,17 +2,18 @@ package messages
 
 import "time"
 
-//Tag keeps key/value in message
+// Tag keeps key/value in message
 type Tag struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
 
-//Message base message interface for sending to queue
+// Message base message interface for sending to queue
 type Message interface {
+	GetID() string
 }
 
-//QueueMessage message going throuht broker
+// QueueMessage message going throuht broker
 type QueueMessage struct {
 	ID    string `json:"id"`
 	Tags  []Tag  `json:"tags,omitempty"`
@@ -28,14 +29,18 @@ const (
 	InformTypeFailed string = "Failed"
 )
 
-//InformMessage message with inform information
+// InformMessage message with inform information
 type InformMessage struct {
 	QueueMessage
 	Type string    `json:"type"`
 	At   time.Time `json:"at"`
 }
 
-//NewQueueMessageFromM copies message
+// NewQueueMessageFromM copies message
 func NewQueueMessageFromM(m *QueueMessage) *QueueMessage {
 	return &QueueMessage{ID: m.ID, Tags: m.Tags}
+}
+
+func (m *QueueMessage) GetID() string {
+	return m.ID
 }
