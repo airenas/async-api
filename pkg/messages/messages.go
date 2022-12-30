@@ -41,6 +41,7 @@ func NewQueueMessageFromM(m *QueueMessage) *QueueMessage {
 	return &QueueMessage{ID: m.ID, Tags: m.Tags}
 }
 
+// GetID returm message's ID
 func (m *QueueMessage) GetID() string {
 	return m.ID
 }
