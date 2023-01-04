@@ -63,11 +63,11 @@ func validate(opt Options) error {
 }
 
 // SaveFile saves file to s3/minio
-func (fs *Filer) SaveFile(ctx context.Context, name string, reader io.Reader) error {
+func (fs *Filer) SaveFile(ctx context.Context, name string, reader io.Reader, fileSize int64) error {
 	if strings.Contains(name, "..") {
 		return fmt.Errorf("wrong path '%s'", name)
 	}
-	info, err := fs.minioClient.PutObject(ctx, fs.bucket, name, reader, -1, minio.PutObjectOptions{})
+	info, err := fs.minioClient.PutObject(ctx, fs.bucket, name, reader, fileSize, minio.PutObjectOptions{})
 	if err != nil {
 		return fmt.Errorf("can't save %s: %w", name, err)
 	}
