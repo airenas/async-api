@@ -23,6 +23,7 @@ type Filer struct {
 // Options is minio client initializatoin options
 type Options struct {
 	URL, User, Key, Bucket string
+	Secure                 bool
 }
 
 // NewFiler creates Minio file saver
@@ -33,7 +34,7 @@ func NewFiler(ctx context.Context, opt Options) (*Filer, error) {
 	}
 	minioClient, err := minio.New(opt.URL, &minio.Options{
 		Creds:  credentials.NewStaticV4(opt.User, opt.Key, ""),
-		Secure: false,
+		Secure: opt.Secure,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("can't init minio client: %w", err)
