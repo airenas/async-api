@@ -18,15 +18,16 @@ import (
 // Restorer implements usage restore functionality
 type Restorer struct {
 	serviceURL string
+	key        string
 	httpClient http.Client
 }
 
 // NewRestorer creates new restorer implementation
-func NewRestorer(url string) (*Restorer, error) {
+func NewRestorer(url string, key string) (*Restorer, error) {
 	if url == "" {
 		return nil, errors.Errorf("no service URL")
 	}
-	res := &Restorer{serviceURL: url}
+	res := &Restorer{serviceURL: url, key: key}
 	res.httpClient = http.Client{Transport: &http.Transport{
 		MaxIdleConns:        2,
 		MaxIdleConnsPerHost: 2,
@@ -78,7 +79,10 @@ func (w *Restorer) invoke(ctx context.Context, service, requestID, errorMsg stri
 			return nil, false, err
 		}
 		req.Header.Set("Content-Type", "application/json")
-		
+		if w.key != "" {
+			req.Header.Set("Authorization", fmt.Sprintf("Key %s", w.key))
+		}
+
 		ctx, cancelF := context.WithTimeout(ctx, time.Second*10)
 		defer cancelF()
 		req = req.WithContext(ctx)

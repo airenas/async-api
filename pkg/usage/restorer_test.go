@@ -1,7 +1,7 @@
 package usage
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,22 +11,37 @@ import (
 )
 
 func TestNewRestorer(t *testing.T) {
-	got, err := NewRestorer("url")
+	got, err := NewRestorer("url", "")
 	assert.Nil(t, err)
 	assert.NotNil(t, got)
-	_, err = NewRestorer("")
+	_, err = NewRestorer("", "")
 	assert.NotNil(t, err)
 }
 
 func TestWorker_Do(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/tt/restore/m:rid", r.RequestURI)
-		b, _ := ioutil.ReadAll(r.Body)
+		b, _ := io.ReadAll(r.Body)
 		assert.Equal(t, `{"error":"err"}`, string(b))
 		rw.WriteHeader(http.StatusOK)
 	}))
 	defer srv.Close()
-	got, err := NewRestorer(srv.URL)
+	got, err := NewRestorer(srv.URL, "")
+	assert.Nil(t, err)
+	err = got.Do(test.Ctx(t), "id1", "tt:m:rid", "err")
+	assert.Nil(t, err)
+}
+
+func TestWorker_AddHeader(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "Key some-secret-key", r.Header.Get("Authorization"))
+		assert.Equal(t, "/tt/restore/m:rid", r.RequestURI)
+		b, _ := io.ReadAll(r.Body)
+		assert.Equal(t, `{"error":"err"}`, string(b))
+		rw.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+	got, err := NewRestorer(srv.URL, "some-secret-key")
 	assert.Nil(t, err)
 	err = got.Do(test.Ctx(t), "id1", "tt:m:rid", "err")
 	assert.Nil(t, err)
@@ -37,7 +52,7 @@ func TestWorker_Skip_NoRequest(t *testing.T) {
 		assert.Fail(t, "unexpected call")
 	}))
 	defer srv.Close()
-	got, err := NewRestorer(srv.URL)
+	got, err := NewRestorer(srv.URL, "")
 	assert.Nil(t, err)
 	err = got.Do(test.Ctx(t), "id1", "", "err")
 	assert.Nil(t, err)
@@ -48,7 +63,7 @@ func TestWorker_Fail(t *testing.T) {
 		rw.WriteHeader(http.StatusBadRequest)
 	}))
 	defer srv.Close()
-	got, err := NewRestorer(srv.URL)
+	got, err := NewRestorer(srv.URL, "")
 	assert.Nil(t, err)
 	err = got.Do(test.Ctx(t), "id1", "tt:m:rid", "err")
 	assert.Error(t, err)
